@@ -29,7 +29,8 @@ export type Disc = {
   numberOfSteps: number;
 };
 
-function createDiscOnCanvas(): Disc {
+function createDiscOnCanvas(num: number): Disc {
+  console.log("xxx  laufende nummer:", num);
   const radius: number = randomRadius();
   const color: RGBA = {
     r: Math.random() * 255,
@@ -45,14 +46,6 @@ function createDiscOnCanvas(): Disc {
   };
 }
 
-async function* createDiscsOnCanvas() {
-  let i = 0;
-  while (true) {
-    console.log("xxx ...")
-    yield await createDiscOnCanvas();
-    await sleep(1); // to switch between async processes (otherwise 'internal()' will not be reached)
-  }
-}
 
 export const startedDiscs$ = new Subject(); // add started discs here
 export const finishedDiscs$ = new Subject(); // add started discs here
@@ -68,22 +61,17 @@ export const numberOfActiveDiscs$ = merge(
   startWith(0),
 );
 
-// export const discs$: Observable<Disc> = from<ObservableInput<Disc>>(createDiscsOnCanvas());
-export const discs$ = zip(
-  from(createDiscsOnCanvas()),
-  interval(1000)
-).pipe(
-  map(([disc, _]) => disc),
+export const discs$ = interval(1000).pipe(
+  map((num) => createDiscOnCanvas(num)),
   share(),
 );
 
-
-startedDiscs$.subscribe(num => console.log("xxx startedDiscs", num ));
 
 discs$.subscribe(startedDiscs$);  // this stops here because the generator runs endlessly
 discs$.subscribe((disc) => console.log("xxx disc1", disc));
 discs$.subscribe((disc) => console.log("xxx disc2", disc));
 
+startedDiscs$.subscribe(num => console.log("xxx startedDiscs", num ));
 
 // debug
 // discs$.pipe(take(10), tap(console.log)).subscribe(startedDiscs$); // this stops here
@@ -91,8 +79,7 @@ discs$.subscribe((disc) => console.log("xxx disc2", disc));
 
 // test:
 
-discs$.subscribe((disc) => console.log("xxx XXXX"));
-// numberOfActiveDiscs$.subscribe((count) => console.log(count));
+numberOfActiveDiscs$.subscribe((count) => console.log("xxx number active", count));
 
 
 console.log("dingsi popingsi");
