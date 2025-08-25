@@ -5,13 +5,10 @@ import {
   randomRadius,
 } from "@/model/random";
 import {
-  asyncScheduler,
-  from,
+  delay,
   interval,
   map,
   merge,
-  observeOn,
-  of,
   scan,
   share,
   startWith,
@@ -59,9 +56,11 @@ export const finishedDiscs$ = new Subject(); // add started discs here
 export const numberOfActiveDiscs$ = merge(
   discs$.pipe(
     map(() => 1), // add 1 in scan() below
+    tap(()=>console.log("xxx added")),
   ),
   finishedDiscs$.pipe(
     map(() => -1), // subtract 1 in scan() below
+    tap(()=>console.log("xxx subtracted")),
   ),
 ).pipe(
   scan((total: number, current: number) => total + current, 0),
@@ -72,11 +71,11 @@ export const numberOfActiveDiscs$ = merge(
 
 
 
-// debug
-// discs$.pipe(take(10), tap(console.log)).subscribe(startedDiscs$); // this stops here
-
-
 // test:
+
+discs$.pipe(
+  delay(2000)
+).subscribe(finishedDiscs$);
 
 numberOfActiveDiscs$.subscribe((count) => console.log("xxx number active", count));
 
