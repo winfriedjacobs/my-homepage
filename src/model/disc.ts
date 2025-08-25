@@ -1,50 +1,54 @@
-import { from } from "@reactivex/rxjs/src";
+import { Position, RGBA } from "@/model/basics";
+import {
+  randomNumberOfSteps,
+  randomPositionForDisc,
+  randomRadius,
+} from "@/model/random";
+import { from, map, merge, scan, share, startWith, Subject } from "rxjs";
 
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from "@/constants/canvas";
-
-
-const randomPosition = (radius) => ({
-  height: Math.random() * CANVAS_HEIGHT - radius,
-  width: Math.random() * CANVAS_WIDTH - radius,
-});
-
-
-type Position = {
-    x: number;
-    y: number;
-}
-
-type Step = {
-    position: Position;
-    opacity: number;  // 0 to 255
-}
-
-type Disc = {
+export type Disc = {
+  color: RGBA;
+  radius: number;
   startPosition: Position;
   endPosition: Position;
   numberOfSteps: number;
+};
 
-  constructor({startPosition: Position, endPosition: Position, numberOfSteps: number}) {
-    this.startPosition = startPosition;
-    this.endPosition = endPosition;
-    this.numberOfSteps = numberOfSteps;
-  }
-
-  steps = function*() {
-      const xStep = (this.endPosition.x - this.startPosition.x) / this.numberOfSteps;
-      const yStep = (this.endPosition.y - this.startPosition.y) / this.numberOfSteps;
-
-      yield this.startPosition;
-      yield this.endPosition;
-  }
-
-  static createOnCanvas = () => {
-    return new Disc({
-      start_position: randomPosition(),
-      end_position: randomPosition(),
-      numberOfSteps: 100,
-    });
+function createDiscOnCanvas(): Disc {
+  const radius: number = randomRadius();
+  const color: RGBA = {
+    r: Math.random() * 255,
+    g: Math.random() * 255,
+    b: Math.random() * 255,
+  };
+  return {
+    color,
+    radius,
+    startPosition: randomPositionForDisc(radius),
+    endPosition: randomPositionForDisc(radius),
+    numberOfSteps: randomNumberOfSteps(),
   };
 }
 
-export const discs$ = from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+function* createDiscsOnCanvas(): Generator<Disc> {
+  while (true) {
+    yield createDiscOnCanvas();
+  }
+}
+
+export const startedDiscs$ = new Subject(); // add started discs here
+export const finishedDiscs$ = new Subject(); // add started discs here
+export const numberOfActiveDiscs$ = merge(
+  startedDiscs$.pipe(
+    map((obj: any) => 1), // add 1
+  ),
+  finishedDiscs$.pipe(
+    map((obj: any) => -1), // subtract 1
+  ),
+).pipe(
+  scan((total: number, current: number) => total + current, 0),
+  startWith(0),
+);
+
+// export const discs$: Observable<Disc> = from<ObservableInput<Disc>>(createDiscsOnCanvas());
+export const discs$ = from(createDiscsOnCanvas()).pipe(share());
