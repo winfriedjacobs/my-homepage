@@ -4,7 +4,8 @@ import {
   randomPositionForDisc,
   randomRadius,
 } from "@/model/random";
-import {
+import {  
+  BehaviorSubject,
   delay,
   interval,
   map,
@@ -43,49 +44,54 @@ function createDiscOnCanvas(num: number): Disc {
   };
 }
 
+// -- Observables
 
-// -- Obervables
+const throttle$ = new BehaviorSubject(0);
 
-export const discs$ = interval(1000).pipe(
+const root$ = interval(1000)
+  // Intervals are scheduled
+  // with async scheduler by default...
+  // .pipe(
+    // observeOn(animationFrameScheduler),
+    // ...but we will observe on animationFrame
+    // scheduler to ensure smooth animation.
+    // skipWhile(throttle$)
+  // );
+
+export const discs$ = root$.pipe(
   map((num) => createDiscOnCanvas(num + 1)),
   share(),
 );
-
 
 export const finishedDiscs$ = new Subject(); // add started discs here
 export const numberOfActiveDiscs$ = merge(
   discs$.pipe(
     map(() => 1), // add 1 in scan() below
-    tap(()=>console.log("xxx added")),
+    tap(() => console.log("xxx added")),
   ),
   finishedDiscs$.pipe(
     map(() => -1), // subtract 1 in scan() below
-    tap(()=>console.log("xxx subtracted")),
+    tap(() => console.log("xxx subtracted")),
   ),
 ).pipe(
   scan((total: number, current: number) => total + current, 0),
   startWith(0),
-  tap(n=>console.log("xxx count current:", n))
+  tap((n) => console.log("xxx count current:", n)),
 );
-
-
-
 
 // test:
 
-discs$.pipe(
-  delay(2000)
-).subscribe(finishedDiscs$);
+discs$.pipe(delay(20000)).subscribe(finishedDiscs$);
 
-numberOfActiveDiscs$.subscribe((count) => console.log("xxx number active", count));
-
+numberOfActiveDiscs$.subscribe((count) =>
+  console.log("xxx number active", count),
+);
 
 console.log("dingsi popingsi");
 
-
 // utils
 
-function sleep(ms: number) {  // should be "awaited" (-> returns a Promise), althoungh not defined as async
-	return new Promise(resolve => setTimeout(resolve, ms));
+function sleep(ms: number) {
+  // should be "awaited" (-> returns a Promise), althoungh not defined as async
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
-
