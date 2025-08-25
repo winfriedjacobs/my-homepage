@@ -4,7 +4,7 @@ import {
   randomPositionForDisc,
   randomRadius,
 } from "@/model/random";
-import { from, map, merge, scan, share, startWith, Subject } from "rxjs";
+import {asyncScheduler, from, map, merge, observeOn, scan, share, startWith, Subject, take, tap} from "rxjs";
 
 export type Disc = {
   color: RGBA;
@@ -13,6 +13,7 @@ export type Disc = {
   endPosition: Position;
   numberOfSteps: number;
 };
+
 
 function createDiscOnCanvas(): Disc {
   const radius: number = randomRadius();
@@ -40,15 +41,34 @@ export const startedDiscs$ = new Subject(); // add started discs here
 export const finishedDiscs$ = new Subject(); // add started discs here
 export const numberOfActiveDiscs$ = merge(
   startedDiscs$.pipe(
-    map((obj: any) => 1), // add 1
+    map(() => 1), // add 1 in scan() below
   ),
   finishedDiscs$.pipe(
-    map((obj: any) => -1), // subtract 1
+    map(() => -1), // subtract 1 in scan() below
   ),
 ).pipe(
   scan((total: number, current: number) => total + current, 0),
   startWith(0),
 );
 
+
 // export const discs$: Observable<Disc> = from<ObservableInput<Disc>>(createDiscsOnCanvas());
-export const discs$ = from(createDiscsOnCanvas()).pipe(share());
+export const discs$ = from(createDiscsOnCanvas())
+    .pipe(
+        observeOn(asyncScheduler),
+        share()
+    );
+
+discs$.subscribe(startedDiscs$);  // this stops here because the generator runs endlessly
+// debug
+discs$.pipe(take(10), tap(console.log)).subscribe(startedDiscs$);  // this stops here
+
+console.log("dongs");
+
+// test:
+
+console.log("dingsi");
+
+discs$.subscribe((disc) => console.log(disc));
+// numberOfActiveDiscs$.subscribe((count) => console.log(count));
+
