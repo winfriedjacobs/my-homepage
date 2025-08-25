@@ -4,7 +4,22 @@ import {
   randomPositionForDisc,
   randomRadius,
 } from "@/model/random";
-import {asyncScheduler, from, map, merge, observeOn, scan, share, startWith, Subject, take, tap} from "rxjs";
+import {
+  asyncScheduler,
+  from,
+  interval,
+  map,
+  merge,
+  observeOn,
+  of,
+  scan,
+  share,
+  startWith,
+  Subject,
+  take,
+  tap,
+  zip,
+} from "rxjs";
 
 export type Disc = {
   color: RGBA;
@@ -13,7 +28,6 @@ export type Disc = {
   endPosition: Position;
   numberOfSteps: number;
 };
-
 
 function createDiscOnCanvas(): Disc {
   const radius: number = randomRadius();
@@ -31,9 +45,12 @@ function createDiscOnCanvas(): Disc {
   };
 }
 
-function* createDiscsOnCanvas(): Generator<Disc> {
+async function* createDiscsOnCanvas() {
+  let i = 0;
   while (true) {
-    yield createDiscOnCanvas();
+    console.log("xxx ...")
+    yield await createDiscOnCanvas();
+    await sleep(1); // to switch between async processes (otherwise 'internal()' will not be reached)
   }
 }
 
@@ -51,24 +68,39 @@ export const numberOfActiveDiscs$ = merge(
   startWith(0),
 );
 
-
 // export const discs$: Observable<Disc> = from<ObservableInput<Disc>>(createDiscsOnCanvas());
-export const discs$ = from(createDiscsOnCanvas())
-    .pipe(
-        observeOn(asyncScheduler),
-        share()
-    );
+export const discs$ = zip(
+  from(createDiscsOnCanvas()),
+  interval(1000)
+).pipe(
+  map(([disc, _]) => disc),
+  share(),
+);
+
+
+startedDiscs$.subscribe(num => console.log("xxx startedDiscs", num ));
 
 discs$.subscribe(startedDiscs$);  // this stops here because the generator runs endlessly
-// debug
-discs$.pipe(take(10), tap(console.log)).subscribe(startedDiscs$);  // this stops here
+discs$.subscribe((disc) => console.log("xxx disc1", disc));
+discs$.subscribe((disc) => console.log("xxx disc2", disc));
 
-console.log("dongs");
+
+// debug
+// discs$.pipe(take(10), tap(console.log)).subscribe(startedDiscs$); // this stops here
+
 
 // test:
 
-console.log("dingsi");
-
-discs$.subscribe((disc) => console.log(disc));
+discs$.subscribe((disc) => console.log("xxx XXXX"));
 // numberOfActiveDiscs$.subscribe((count) => console.log(count));
+
+
+console.log("dingsi popingsi");
+
+
+// utils
+
+function sleep(ms: number) {  // should be "awaited" (-> returns a Promise), althoungh not defined as async
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
 
