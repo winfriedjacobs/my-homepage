@@ -47,10 +47,17 @@ function createDiscOnCanvas(num: number): Disc {
 }
 
 
-export const startedDiscs$ = new Subject(); // add started discs here
+// -- Obervables
+
+export const discs$ = interval(1000).pipe(
+  map((num) => createDiscOnCanvas(num + 1)),
+  share(),
+);
+
+
 export const finishedDiscs$ = new Subject(); // add started discs here
 export const numberOfActiveDiscs$ = merge(
-  startedDiscs$.pipe(
+  discs$.pipe(
     map(() => 1), // add 1 in scan() below
   ),
   finishedDiscs$.pipe(
@@ -59,19 +66,11 @@ export const numberOfActiveDiscs$ = merge(
 ).pipe(
   scan((total: number, current: number) => total + current, 0),
   startWith(0),
-);
-
-export const discs$ = interval(1000).pipe(
-  map((num) => createDiscOnCanvas(num)),
-  share(),
+  tap(n=>console.log("xxx count current:", n))
 );
 
 
-discs$.subscribe(startedDiscs$);  // this stops here because the generator runs endlessly
-discs$.subscribe((disc) => console.log("xxx disc1", disc));
-discs$.subscribe((disc) => console.log("xxx disc2", disc));
 
-startedDiscs$.subscribe(num => console.log("xxx startedDiscs", num ));
 
 // debug
 // discs$.pipe(take(10), tap(console.log)).subscribe(startedDiscs$); // this stops here
