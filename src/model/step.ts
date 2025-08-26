@@ -1,3 +1,6 @@
+import { from, tap, of, zip, interval } from "rxjs";
+import { Disc } from "./disc";
+
 type Step = {
   sequentialNumber: number;
   position: Position;
@@ -32,3 +35,18 @@ function* steps(disc: Disc): Generator<Step> {
   yield this.startPosition;
   yield this.endPosition;
 }
+
+// tests
+
+function* generate() {
+  for (let i = 0; i < 100; i++) {
+    yield "wert" + i;
+  }
+}
+
+// zip(from(generate()), interval(1000)).pipe(
+zip(generate(), interval(1000))
+  .pipe(tap((val) => console.log("of_xxx", val)))
+  .subscribe();
+
+console.log("Ende");
