@@ -68,25 +68,3 @@ export const numberOfActiveDiscs$ = merge(
   startWith(0),
   tap((n) => console.log("xxx count current:", n)),
 );
-
-// tests:
-
-discs$.pipe(delay(20000)).subscribe(finishedDiscs$);
-numberOfActiveDiscs$
-  .pipe(
-    map((count) => count < MAX_NUMBER_DISCS), // send a false to flag when count >= MAX_NUMBER_DISCS
-  )
-  .subscribe(flag$);
-
-numberOfActiveDiscs$.subscribe((count) =>
-  console.log("xxx number active", count),
-);
-
-console.log("dingsi popingsi");
-
-// utils
-
-function sleep(ms: number) {
-  // should be "awaited" (-> returns a Promise), althoungh not defined as async
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
