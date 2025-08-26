@@ -6,8 +6,6 @@ import {
 } from "@/model/random";
 import {
   BehaviorSubject,
-  count,
-  delay,
   distinctUntilChanged,
   EMPTY,
   interval,
@@ -18,19 +16,17 @@ import {
   startWith,
   Subject,
   switchMap,
-  take,
   tap,
-  zip,
 } from "rxjs";
 
 import { createDiscOnCanvas } from "@/model/disc";
 
 // constants
-const MAX_NUMBER_DISCS = 15;
+export const MAX_NUMBER_DISCS = 15;
 
 // -- Observables
 
-const flag$ = new BehaviorSubject(true);
+export const flag$ = new BehaviorSubject(true);
 
 const root$ = flag$.pipe(
   distinctUntilChanged(),

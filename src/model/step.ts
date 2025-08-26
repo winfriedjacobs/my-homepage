@@ -9,14 +9,12 @@ export type Step = {
 };
 
 function* basicSteps(
-  startPosition: Position, 
+  startPosition: Position,
   endPosition: Position,
-  numberOfSteps: number
+  numberOfSteps: number,
 ): Generator<Step> {
-  const xStep =
-    (endPosition.x - startPosition.x) / numberOfSteps;
-  const yStep =
-    (endPosition.y - startPosition.y) / numberOfSteps;
+  const xStep = (endPosition.x - startPosition.x) / numberOfSteps;
+  const yStep = (endPosition.y - startPosition.y) / numberOfSteps;
 
   for (
     let i = 0, currentPosition = startPosition;
@@ -36,9 +34,9 @@ function* basicSteps(
 }
 
 export function* steps(
-  startPosition: Position, 
+  startPosition: Position,
   endPosition: Position,
-  numberOfSteps: number
+  numberOfSteps: number,
 ) {
   const upper_threshold = numberOfSteps - THRESHOLD;
   for (const step of basicSteps(startPosition, endPosition, numberOfSteps)) {
