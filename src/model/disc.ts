@@ -4,9 +4,12 @@ import {
   randomPositionForDisc,
   randomRadius,
 } from "@/model/random";
-import {  
+import {
   BehaviorSubject,
+  count,
   delay,
+  distinctUntilChanged,
+  EMPTY,
   interval,
   map,
   merge,
@@ -14,6 +17,7 @@ import {
   share,
   startWith,
   Subject,
+  switchMap,
   take,
   tap,
   zip,
@@ -27,8 +31,13 @@ export type Disc = {
   numberOfSteps: number;
 };
 
+// constants
+const MAX_NUMBER_DISCS = 15;
+
+//---
+
 function createDiscOnCanvas(num: number): Disc {
-  console.log("xxx  laufende nummer:", num);
+  console.log("laufende nummer:", num);
   const radius: number = randomRadius();
   const color: RGBA = {
     r: Math.random() * 255,
@@ -46,17 +55,23 @@ function createDiscOnCanvas(num: number): Disc {
 
 // -- Observables
 
-const throttle$ = new BehaviorSubject(0);
+const flag$ = new BehaviorSubject(true);
 
-const root$ = interval(1000)
-  // Intervals are scheduled
-  // with async scheduler by default...
-  // .pipe(
-    // observeOn(animationFrameScheduler),
-    // ...but we will observe on animationFrame
-    // scheduler to ensure smooth animation.
-    // skipWhile(throttle$)
-  // );
+const root$ = flag$.pipe(
+  distinctUntilChanged(),
+  switchMap(
+    (booleanValue) => (booleanValue ? interval(1000) : EMPTY), // stop when flag is false
+  ),
+);
+
+// Intervals are scheduled
+// with async scheduler by default...
+// .pipe(
+//   observeOn(animationFrameScheduler),
+//   ...but we will observe on animationFrame
+//   scheduler to ensure smooth animation.
+//   skipWhile(throttle$)
+// );
 
 export const discs$ = root$.pipe(
   map((num) => createDiscOnCanvas(num + 1)),
@@ -79,9 +94,14 @@ export const numberOfActiveDiscs$ = merge(
   tap((n) => console.log("xxx count current:", n)),
 );
 
-// test:
+// tests:
 
 discs$.pipe(delay(20000)).subscribe(finishedDiscs$);
+numberOfActiveDiscs$
+  .pipe(
+    map((count) => count < MAX_NUMBER_DISCS), // send a false to flag when count >= MAX_NUMBER_DISCS
+  )
+  .subscribe(flag$);
 
 numberOfActiveDiscs$.subscribe((count) =>
   console.log("xxx number active", count),
