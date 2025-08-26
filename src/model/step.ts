@@ -1,24 +1,26 @@
-import { from, tap, of, zip, interval } from "rxjs";
-import { createDiscOnCanvas, Disc } from "../model/disc";
 import { MAX_ALPHA, Position } from "./basics";
 
 const THRESHOLD = 25; // fade-in/fade-out
 
-type Step = {
+export type Step = {
   sequentialNumber: number;
   position: Position;
   opacity: number; // 0 to 255
 };
 
-function* basicSteps(disc: Disc): Generator<Step> {
+function* basicSteps(
+  startPosition: Position, 
+  endPosition: Position,
+  numberOfSteps: number
+): Generator<Step> {
   const xStep =
-    (disc.endPosition.x - disc.startPosition.x) / disc.numberOfSteps;
+    (endPosition.x - startPosition.x) / numberOfSteps;
   const yStep =
-    (disc.endPosition.y - disc.startPosition.y) / disc.numberOfSteps;
+    (endPosition.y - startPosition.y) / numberOfSteps;
 
   for (
-    let i = 0, currentPosition = disc.startPosition;
-    i < disc.numberOfSteps;
+    let i = 0, currentPosition = startPosition;
+    i < numberOfSteps;
     i++,
       currentPosition = {
         x: currentPosition.x + xStep,
@@ -33,9 +35,13 @@ function* basicSteps(disc: Disc): Generator<Step> {
   }
 }
 
-function* steps(disc: Disc) {
-  const upper_threshold = disc.numberOfSteps - THRESHOLD;
-  for (const step of basicSteps(disc)) {
+export function* steps(
+  startPosition: Position, 
+  endPosition: Position,
+  numberOfSteps: number
+) {
+  const upper_threshold = numberOfSteps - THRESHOLD;
+  for (const step of basicSteps(startPosition, endPosition, numberOfSteps)) {
     const newStep = { ...step };
     if (newStep.sequentialNumber < THRESHOLD) {
       // const diff = THRESHOLD - newStep.sequentialNumber ;
@@ -45,42 +51,12 @@ function* steps(disc: Disc) {
       newStep.opacity *= alpha;
     } else if (newStep.sequentialNumber >= upper_threshold) {
       // const diff = newStep.sequentialNumber - upper_threshold;
-      //            = newStep.sequentialNumber - disc.numberOfSteps + THRESHOLD;
+      //            = newStep.sequentialNumber - numberOfSteps + THRESHOLD;
       // alpha =  (THRESHOLD - diff)  / THRESHOLD;
       // shorter:
-      const alpha = (disc.numberOfSteps - newStep.sequentialNumber) / THRESHOLD;
+      const alpha = (numberOfSteps - newStep.sequentialNumber) / THRESHOLD;
       newStep.opacity *= alpha;
     }
     yield newStep;
   }
 }
-
-// tests
-
-if (false) {
-  function* generate() {
-    for (let i = 0; i < 100; i++) {
-      yield "wert" + i;
-    }
-  }
-
-  // zip(from(generate()), interval(1000)).pipe(
-  zip(generate(), interval(1000))
-    .pipe(tap((val) => console.log("of_xxx", val)))
-    .subscribe();
-}
-
-if (true) {
-  const disc = createDiscOnCanvas(23);
-
-  from(steps(disc))
-    .pipe(tap((step) => {
-      console.log("step_seqNum:", step.sequentialNumber);
-      console.log("step_opacity:", step.opacity);
-    }))
-    .subscribe();
-
-  console.log("numberOfSteps", disc.numberOfSteps);
-}
-
-console.log("Ende");
