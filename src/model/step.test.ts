@@ -1,6 +1,7 @@
 import { from, tap, of, zip, interval } from "rxjs";
 import { createDiscOnCanvas, Disc } from "@/model/disc";
 import { steps } from "@/model/step";
+import { INTERVAL_OF_DISC_CREATION } from "@/rx/discs";
 
 if (false) {
   function* generate() {
@@ -9,8 +10,7 @@ if (false) {
     }
   }
 
-  // zip(from(generate()), interval(1000)).pipe(
-  zip(generate(), interval(1000))
+  zip(generate(), interval(INTERVAL_OF_DISC_CREATION))
     .pipe(tap((val) => console.log("of_xxx", val)))
     .subscribe();
 }

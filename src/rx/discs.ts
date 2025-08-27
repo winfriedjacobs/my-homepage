@@ -1,9 +1,3 @@
-import { Position, RGBA } from "@/model/basics";
-import {
-  randomNumberOfSteps,
-  randomPositionForDisc,
-  randomRadius,
-} from "@/model/random";
 import {
   BehaviorSubject,
   distinctUntilChanged,
@@ -17,12 +11,34 @@ import {
   Subject,
   switchMap,
   tap,
+  zip,
 } from "rxjs";
 
-import { createDiscOnCanvas } from "@/model/disc";
+import { Position, RGBA } from "@/model/basics";
+import {
+  randomNumberOfSteps,
+  randomPositionForDisc,
+  randomRadius,
+} from "@/model/random";
+
+import { createDiscOnCanvas, Disc } from "@/model/disc";
+import { steps } from "@/model/step";
 
 // constants
+export const INTERVAL_OF_DISC_CREATION = 12000; // milliseconds
 export const MAX_NUMBER_DISCS = 15;
+
+// --
+
+export function* stepsFromDisc(disc: Disc) {
+  yield* steps(disc.startPosition, disc.endPosition, disc.numberOfSteps);
+}
+
+export const stepsFromDiscDelayed$ = (intervalDelay: number, disc: Disc) =>
+  zip(
+    interval(intervalDelay),
+    stepsFromDisc(disc), // here the same as: from(stepsFromDisc(disc))
+  ).pipe(map(([_, disc]) => disc));
 
 // -- Observables
 
@@ -31,7 +47,8 @@ export const flag$ = new BehaviorSubject(true);
 const root$ = flag$.pipe(
   distinctUntilChanged(),
   switchMap(
-    (booleanValue) => (booleanValue ? interval(1000) : EMPTY), // stop when flag is false
+    (booleanValue) =>
+      booleanValue ? interval(INTERVAL_OF_DISC_CREATION) : EMPTY, // stop when flag is false
   ),
 );
 

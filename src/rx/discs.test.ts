@@ -1,21 +1,11 @@
-import {
-  delay,
-  from,
-  interval,
-  map,
-  mergeMap,
-  share,
-  tap,
-  zip,
-  type Observable,
-} from "rxjs";
+import { delay, map, mergeMap, share, tap } from "rxjs";
 import { Step, steps } from "@/model/step";
 import { Disc } from "@/model/disc";
 import {
   discs$,
   finishedDiscs$,
-  MAX_NUMBER_DISCS,
   numberOfActiveDiscs$,
+  stepsFromDiscDelayed$,
 } from "./discs";
 
 // tests:
@@ -26,20 +16,6 @@ function test01() {
     console.log("xxx number active", count),
   );
 }
-
-function* stepsFromDisc(disc: Disc) {
-  yield* steps(disc.startPosition, disc.endPosition, disc.numberOfSteps);
-}
-
-
-const stepsFromDiscDelayed$ = (intervalDelay: number, disc: Disc) => zip(
-  interval(intervalDelay), 
-  stepsFromDisc(disc)  // from(stepsFromDisc(disc))
-).pipe(
-  map(([_, disc]) => disc)
-)
-
-
 
 function test02() {
   const x$ = discs$.pipe(
@@ -54,7 +30,7 @@ function test02() {
     share(),
   );
 
-  x$.subscribe()
+  x$.subscribe();
 
   numberOfActiveDiscs$.subscribe((count) =>
     console.log("xxx number active", count),
