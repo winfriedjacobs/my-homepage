@@ -10,7 +10,7 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["svg_implementation/src/*"]
     }
   },
   "exclude": ["dist", "node_modules"]
