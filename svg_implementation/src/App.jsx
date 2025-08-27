@@ -62,20 +62,31 @@ export const App = () => {
 
     // Funktion zum Erzeugen von 15 Scheiben mit zufälligen Eigenschaften
     const createCircles = () => {
-        const colors = ['#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6610f2', '#e83e8c', '#fd7e14', '#20c997', '#6f42c1', '#adb5bd', '#343a40', '#007bff', '#28a745', '#dc3545'];
+        // Generiert eine zufällige RGB-Farbe mit einem Alpha-Wert
+        const getRandomRgba = () => {
+            const r = Math.floor(Math.random() * 256);
+            const g = Math.floor(Math.random() * 256);
+            const b = Math.floor(Math.random() * 256);
+            // Der Alpha-Wert (a) wurde auf 0.5 gesetzt, um Transparenz zu erreichen
+            return `rgba(${r}, ${g}, ${b}, 0.5)`;
+        };
+        
         for (let i = 0; i < 15; i++) {
             const radius = 30;
             const x = Math.random() * (canvas.width - radius * 2) + radius;
             const y = Math.random() * (canvas.height - radius * 2) + radius;
             const dx = (Math.random() - 0.5) * 2.0;
             const dy = (Math.random() - 0.5) * 2.5;
-            const color = colors[i % colors.length];
+            const color = getRandomRgba(); // Verwendet die neue Funktion für zufällige transparente Farben
             circles.push(new Circle(x, y, radius, dx, dy, color));
         }
     };
 
     // Funktion für die Animationsschleife
     const animate = () => {
+
+        console.log(circles);
+
         // Löschen des gesamten Canvas-Bereichs
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -107,9 +118,10 @@ export const App = () => {
     <div className="flex justify-center items-center min-h-screen bg-[#f0f4f8] p-4">
       <canvas 
         ref={canvasRef} 
-        className="rounded-xl shadow-lg bg-[#0d1117] max-w-full h-[calc(0vh-22rem)]"
+        className="rounded-xl shadow-lg bg-[#0d1117] max-w-full h-[calc(100vh-2rem)]"
       ></canvas>
     </div>
   );
 };
+
 
