@@ -24,7 +24,6 @@ import {
 import { createDiscOnCanvas, Disc } from "@/model/disc";
 import { steps } from "@/model/step";
 
-
 // constants
 export const INTERVAL_OF_DISC_CREATION = 2000; // milliseconds
 export const MAX_NUMBER_DISCS = 15;
@@ -34,7 +33,6 @@ export const MAX_NUMBER_DISCS = 15;
 export function* stepsFromDisc(disc: Disc) {
   yield* steps(disc.startPosition, disc.endPosition, disc.numberOfSteps);
 }
-
 
 // -- Observables
 

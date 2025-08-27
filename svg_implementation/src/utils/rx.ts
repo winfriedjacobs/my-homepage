@@ -1,7 +1,9 @@
-import { interval, map, Observable, zip } from 'rxjs';
+import { interval, map, Observable, zip } from "rxjs";
 
-
-export function fromIteratorWithInterval(generator: Generator, intervalLength: number): Observable<any> {
+export function fromGeneratorWithInterval(
+  generator: Generator,
+  intervalLength: number,
+): Observable<any> {
   return zip(
     interval(intervalLength),
     generator, // here the same as: from(generator)
@@ -11,7 +13,7 @@ export function fromIteratorWithInterval(generator: Generator, intervalLength: n
 
 // alternative, basic implementation
 /*
-export function fromIteratorWithInterval(generator: Generator, intervalLength: number): Observable<any> {
+export function fromGeneratorWithInterval(generator: Generator, intervalLength: number): Observable<any> {
   return new Observable(observer => {
     function scheduleNext() {
       const result = generator.next();
@@ -43,7 +45,7 @@ function* gen() {
 }
 
 // Observable erstellen
-const obs$ = fromGenerator(gen(), 1000);
+const obs$ = fromGeneratorWithInterval(gen(), 1000);
 
 // Subscription
 obs$.subscribe({
