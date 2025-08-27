@@ -8,10 +8,10 @@ import reactLogo from "./react.svg";
 
 export function App() {
 
-  const [cy, setCy] = useState(-15);
+  const [cy, setCy] = useState(0);
   
   useEffect(()=>{
-    setInterval(()=>setCy(curr => curr + 0.3), 10);
+    setInterval(()=>setCy(curr => (curr + 0.30) % 150), 40);
   }, [])
 
   return (
@@ -22,7 +22,7 @@ export function App() {
       </div>
 
       <div>
-        <DiscIcon fill="red" cy={cy} />
+        <DiscIcon fill="red" cy={cy - 20} />
       </div>
 
       <h1>Bun + React</h1>
