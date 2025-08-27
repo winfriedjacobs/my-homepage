@@ -31,10 +31,20 @@ function* stepsFromDisc(disc: Disc) {
   yield* steps(disc.startPosition, disc.endPosition, disc.numberOfSteps);
 }
 
+
+const stepsFromDiscDelayed$ = (intervalDelay: number, disc: Disc) => zip(
+  interval(intervalDelay), 
+  stepsFromDisc(disc)  // from(stepsFromDisc(disc))
+).pipe(
+  map(([_, disc]) => disc)
+)
+
+
+
 function test02() {
   const x$ = discs$.pipe(
     mergeMap((disc: Disc) =>
-      from(stepsFromDisc(disc)).pipe(
+      stepsFromDiscDelayed$(300, disc).pipe(
         map((step: Step) => [disc, step] as [Disc, Step]),
       ),
     ),
@@ -44,7 +54,7 @@ function test02() {
     share(),
   );
 
-  x$.pipe().subscribe(console.log);
+  x$.subscribe()
 
   numberOfActiveDiscs$.subscribe((count) =>
     console.log("xxx number active", count),
