@@ -1,14 +1,23 @@
-import { Observable } from 'rxjs';
+import { interval, map, Observable, zip } from 'rxjs';
 
-function fromGenerator(gen: Generator, delay: number): Observable<any> {
+
+export function fromIteratorWithInterval(generator: Generator, intervalLength: number): Observable<any> {
+  return zip(
+    interval(intervalLength),
+    generator, // here the same as: from(generator)
+  ).pipe(map(([_, elem]) => elem));
+}
+// Usage examples: see below
+
+// alternative, basic implementation
+/*
+export function fromIteratorWithInterval(generator: Generator, intervalLength: number): Observable<any> {
   return new Observable(observer => {
-    const iterator = gen;
-    
     function scheduleNext() {
-      const result = iterator.next();
+      const result = generator.next();
       if (!result.done) {
         observer.next(result.value);
-        setTimeout(scheduleNext, delay);
+        setTimeout(scheduleNext, intervalLength);
       } else {
         observer.complete();
       }
@@ -18,14 +27,15 @@ function fromGenerator(gen: Generator, delay: number): Observable<any> {
     
     return () => {
       // Cleanup if unsubscribed
-      iterator.return(undefined);
+      generator.return(undefined);
     };
   });
 }
+*/
 
-// Beispiel zur Verwendung:
+// Usage examples
 /*
-// Generator-Funktion
+// Generator function
 function* gen() {
   yield 1;
   yield 2;

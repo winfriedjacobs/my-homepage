@@ -5,8 +5,10 @@ import {
   discs$,
   finishedDiscs$,
   numberOfActiveDiscs$,
-  stepsFromDiscDelayed$,
+  stepsFromDisc,
 } from "./discs";
+import { fromIteratorWithInterval } from "@/utils/rx";
+
 
 // tests:
 
@@ -20,7 +22,10 @@ function test01() {
 function test02() {
   const x$ = discs$.pipe(
     mergeMap((disc: Disc) =>
-      stepsFromDiscDelayed$(300, disc).pipe(
+      fromIteratorWithInterval(
+        stepsFromDisc(disc), 
+        3000
+      ).pipe(
         map((step: Step) => [disc, step] as [Disc, Step]),
       ),
     ),
