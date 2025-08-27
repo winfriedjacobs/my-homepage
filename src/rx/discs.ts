@@ -49,8 +49,6 @@ export const discs$ = root$.pipe(
   share(),
 );
 
-
-
 export const finishedDiscs$ = new Subject(); // add started discs here
 export const numberOfActiveDiscs$ = merge(
   discs$.pipe(
@@ -69,7 +67,7 @@ export const numberOfActiveDiscs$ = merge(
 
 numberOfActiveDiscs$
   .pipe(
-    map((count) => count < MAX_NUMBER_DISCS), 
+    map((count) => count < MAX_NUMBER_DISCS),
     // send a false to flag when count >= MAX_NUMBER_DISCS
     // which means: suspend creation of discs when count >= MAX_NUMBER_DISCS
   )
