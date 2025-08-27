@@ -31,12 +31,13 @@ function* stepsFromDisc(disc: Disc) {
   yield* steps(disc.startPosition, disc.endPosition, disc.numberOfSteps);
 }
 
-const stepsFromDisc$ = (disc: Disc): Observable<Step> =>
-  from(stepsFromDisc(disc));
-
 function test02() {
   const x$ = discs$.pipe(
-    mergeMap((disc) => stepsFromDisc$(disc).pipe(map((step) => [disc, step]))),
+    mergeMap((disc: Disc) =>
+      from(stepsFromDisc(disc)).pipe(
+        map((step: Step) => [disc, step] as [Disc, Step]),
+      ),
+    ),
     tap(([d, s]: [Disc, Step]) =>
       console.log("disc, step", d.id, s.sequentialNumber),
     ),
