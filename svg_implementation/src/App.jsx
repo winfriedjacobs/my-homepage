@@ -10,8 +10,11 @@ export const App = () => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
+    // canvasRef.current is set in <canvas ref={canvasRef} ...>, see below.
+    // useEffect is (almost?) always run _after_ the DOM is updated and 
+    // the canvas element is mounted
     const canvas = canvasRef.current;
-    if (!canvas) return; // Stellt sicher, dass das Canvas-Element existiert
+    if (!canvas) return;  // ensures that the canvas element is present
 
     // Holen Sie sich den 2D-Rendering-Kontext
     const ctx = canvas.getContext("2d");
