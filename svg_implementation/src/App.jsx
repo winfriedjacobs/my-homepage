@@ -1,10 +1,8 @@
 import React, { useEffect, useRef } from "react";
 
-import { 
-  circles, 
-  createCircles
- } from "./canvas/canvas";
+import { createCircles } from "./canvas/circle";
 
+// import { animate } from "./canvas/animate";
 
 // Hauptkomponente, die die Canvas-Animation rendert
 export const App = () => {
@@ -24,7 +22,6 @@ export const App = () => {
       canvas.height = window.innerHeight;
     };
 
-    // Funktion für die Animationsschleife
     const animate = () => {
       console.log(circles);
 
@@ -42,7 +39,7 @@ export const App = () => {
 
     // Initialisierung
     resizeCanvas();
-    createCircles({ canvas });
+    const circles = createCircles({ canvas });
     animate();
 
     // Listener für die Größenänderung des Fensters

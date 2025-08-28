@@ -1,4 +1,4 @@
-// circles
+import { getRandomRgba } from "../utils/rgba";
 
 // Klasse für die Scheiben
 class Circle {
@@ -39,21 +39,9 @@ class Circle {
   }
 }
 
-
-// Array zum Speichern der Scheiben
-export const circles = [];
-
-
 // Funktion zum Erzeugen von 15 Scheiben mit zufälligen Eigenschaften
 export const createCircles = ({ canvas }) => {
-  // Generiert eine zufällige RGB-Farbe mit einem Alpha-Wert
-  const getRandomRgba = () => {
-    const r = Math.floor(Math.random() * 256);
-    const g = Math.floor(Math.random() * 256);
-    const b = Math.floor(Math.random() * 256);
-    // Der Alpha-Wert (a) wurde auf 0.5 gesetzt, um Transparenz zu erreichen
-    return `rgba(${r}, ${g}, ${b}, 0.5)`;
-  };
+  const circles = [];
 
   for (let i = 0; i < 15; i++) {
     const radius = 30;
@@ -64,4 +52,6 @@ export const createCircles = ({ canvas }) => {
     const color = getRandomRgba(); // Verwendet die neue Funktion für zufällige transparente Farben
     circles.push(new Circle(x, y, radius, dx, dy, color));
   }
+
+  return circles;
 };

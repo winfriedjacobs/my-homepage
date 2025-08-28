@@ -1,0 +1,1 @@
+// Funktion für die Animationsschleife
