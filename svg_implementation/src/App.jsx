@@ -1,29 +1,10 @@
 import React, { useEffect, useRef } from "react";
 
-import { Circle, circles } from "./canvas/canvas";
+import { 
+  circles, 
+  createCircles
+ } from "./canvas/canvas";
 
-
-// Funktion zum Erzeugen von 15 Scheiben mit zufälligen Eigenschaften
-const createCircles = ({ canvas }) => {
-  // Generiert eine zufällige RGB-Farbe mit einem Alpha-Wert
-  const getRandomRgba = () => {
-    const r = Math.floor(Math.random() * 256);
-    const g = Math.floor(Math.random() * 256);
-    const b = Math.floor(Math.random() * 256);
-    // Der Alpha-Wert (a) wurde auf 0.5 gesetzt, um Transparenz zu erreichen
-    return `rgba(${r}, ${g}, ${b}, 0.5)`;
-  };
-
-  for (let i = 0; i < 15; i++) {
-    const radius = 30;
-    const x = Math.random() * (canvas.width - radius * 2) + radius;
-    const y = Math.random() * (canvas.height - radius * 2) + radius;
-    const dx = (Math.random() - 0.5) * 2.0;
-    const dy = (Math.random() - 0.5) * 2.5;
-    const color = getRandomRgba(); // Verwendet die neue Funktion für zufällige transparente Farben
-    circles.push(new Circle(x, y, radius, dx, dy, color));
-  }
-};
 
 // Hauptkomponente, die die Canvas-Animation rendert
 export const App = () => {
