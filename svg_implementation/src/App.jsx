@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 
 import { createCircles } from "./canvas/circle";
 
-// import { animate } from "./canvas/animate";
+import { basicAnimate } from "./canvas/animate";
 
 // Hauptkomponente, die die Canvas-Animation rendert
 export const App = () => {
@@ -23,16 +23,9 @@ export const App = () => {
     };
 
     const animate = () => {
-      console.log(circles);
+      // console.log(circles);
 
-      // Löschen des gesamten Canvas-Bereichs
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Aktualisieren und Zeichnen jeder Scheibe im Array
-      circles.forEach((circle) => {
-        circle.update({ canvas, ctx });
-      });
-
+      basicAnimate(canvas, circles, ctx);
       // Fordert den Browser auf, das nächste Animationsframe aufzurufen
       requestAnimationFrame(animate);
     };
